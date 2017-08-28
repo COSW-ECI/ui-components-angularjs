@@ -56,8 +56,94 @@ Using different components from the Bootstrap Framework to have an elegant UI.
 
 #### Part 2: Users and Images
 
-1) Navigate */src/app/models* and create a User model:
+1) Navigate */src/app/models* and create a *User* model class:
 
     ```` TypeScript
-        ng g class user
+        export class User {
+            private name: string;
+            private lastname: string;
+            private image: string;
+        
+            constructor(name: string, lastname: string, image: string) {
+                this.name = name;
+                this.lastname = lastname;
+                this.image = image;
+            }
+        }
     ````
+    
+
+2) Navigate */src/app/pages* and create the *user-list-page* package and inside create the following files:
+
+* user-list-page.component.css
+* user-list-page.component.html
+* user-list-page.component.ts
+
+3) Modify the content of *user-list-page.component.html* so it displays the user's info in a table. In order to display the user image use the following code:
+
+    ````html
+        <td><img [src]="user.image" width="150" height="150" /></td>
+    ````
+**Notice that the user image is a url that points to an existing image on the web.    
+
+
+4) Modify the content of *user-list-page.component.ts* so it handles the users list logic (have a look at the *task-list-page.component.ts* for some inspiration).
+
+5) Navigate */src/app/pages* and create the *user-edit-page* package and inside create the following files:
+   
+   * user-edit-page.component.css
+   * user-edit-page.component.html
+   * user-edit-page.component.ts
+
+6) Modify the content of *user-edit-page.component.html* so it contains a form to capture the user's data.
+
+7) Modify the content of *user-edit-page.component.ts* so it contains the logic to add users (have a look at the *task-edit-page.component.ts* for some inspiration).
+
+8) Navigate to */src/app/services* and create a service *users.service.ts*  to handle the requests to create and list the users.
+
+    If you want to avoid having to start the SpringBoot project you can add the following mocked code to your methods to skip the security (use this only for testing locally).
+ 
+    ````TypeScript
+         
+        login(username: string, password: string) {
+           // Mock
+           this.authService.accessToken = 'test_access_token';
+           return Observable.of({ access_token: this.authService.accessToken });
+        ...
+        
+        list(): Observable<User[]> {
+            // Mock
+            return Observable.of(this.users);
+        ...
+            
+        create(name: string, lastname: string, image: string) {
+          // Mock
+          this.users.push(new User(name, lastname, image));
+          return Observable.of({});  
+        ...
+    ````    
+
+#### Part 3: Users API
+
+1) Open Spring Boot Project from the previous code lab.
+
+2) Add the missing *image* attribute to the *User* model.
+
+3) Implement the logic of the *createUser* method in the *UserServiceImpl* 
+
+4) Implement the endpoint required to retrieve the users list in the *UserController*
+
+    ````Java
+    @RequestMapping( value = "/items", method = RequestMethod.GET )
+    public List<User> getUsers(){
+    }
+    ````
+5) Implement the method *registerUser* so it calls the proper method of the *UserService*
+
+6) Comment the Mock code of the Angular project and add the proper implementation to call the API in the login, list and create methods inside the *users.service.ts*.
+
+7) Finally compile the angular project and include the compile output files into the *resources/static* folder of the Spring Boot project. Test and verify that it works correctly :D .
+
+
+#### Bonus: master your skills and prove yourself that you actually understand
+4) Implement a call to the server so when the search button is pressed then the method *findUserByEmail* of the Users API is called. A user that has an email that matches the query should be displayed inside the dialog. If no user is found then display a message saying "No user found with the email address".
